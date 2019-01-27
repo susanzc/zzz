@@ -189,13 +189,13 @@ class App extends Component {
       let end = time.length;
       time = time.substring(0, end - 6) + " " + time.substring(end - 2, end);
     alarms.push(
-    <ListGroupItem style={{margin: 10, width: 600}}>
-    <div style={{display: 'flex'}}>
+    <ListGroupItem style={{margin: 10, width: 500, borderStyle: 'dashed', borderWidth: '5px', borderColor: 'grey'}}>
+    <div style={{display: 'flex', color: 'dimgray'}}>
         <div style={{width: 500}}>
           <div style={{fontWeight: 'bold'}}>{time}</div>
-          <div>Playlist: {alarm.pl.name}</div>
+          <div style={{fontWeight: 'normal', fontSize: '16pt'}}>Playlist: {alarm.pl.name}</div>
         </div>
-        <div>
+        <div style={{paddingTop: '12px'}}>
           <Button size="md" color="danger" onClick={()=>this.removeAlarm(alarm)}>Remove</Button>
           </div>
     </div>
@@ -224,7 +224,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <div style={{float: 'right', margin: 20}}>Hi, {(this.state.user).split(" ")[0]}</div>
+        <div hidden style={{float: 'right', margin: 20}}>Hi, {(this.state.user).split(" ")[0]}</div>
         <br/>
         <center>
           {this.state.audio != null && !this.state.audio.ended &&
@@ -233,13 +233,13 @@ class App extends Component {
             <div style={{float: 'left', padding: 12}}>{this.state.displayText}</div>
           </div>
           }
-        <div style={{marginTop: 50, color: "grey"}}>
+        <div style={{marginTop: 50, color: "white", fontSize: '18pt', fontWeight: '600'}}>
          {this.state.activeAlarms.length == 0? "No Alarms" : 
          <ListGroup>{this.renderAlarms()}</ListGroup>}
         </div>
         </center>
-        <div style={{right: 50, position: 'absolute', bottom: 50}}>
-        <Button size="lg" color="primary" onClick={this.toggleModal}>+ Add Alarm</Button>
+        <div style={{right: 50, position: 'fixed', bottom: 50}}>
+        <Button style={{boxShadow: '0px 0px 20px 5px lightseagreen'}}size="lg" color="warning" onClick={this.toggleModal}>+ Add Alarm</Button>
         </div>
         
         <Modal isOpen={this.state.modalOpen} toggle={this.toggleModal}>
