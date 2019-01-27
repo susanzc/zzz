@@ -36,7 +36,7 @@ class App extends Component {
     this.addAlarm = this.addAlarm.bind(this);
     this.setActivePl = this.setActivePl.bind(this);
     this.renderPlaylists = this.renderPlaylists.bind(this);
-    this.addAlarm = this.addAlarm.bind(this);
+    this.removeAlarm = this.removeAlarm.bind(this);
   }
 
   componentDidMount() {
@@ -62,6 +62,14 @@ class App extends Component {
     return (window.location.href.includes("access_token") || this.tokenSaved());
   }
 
+  removeAlarm(alarm) {
+    let alarms = this.state.activeAlarms;
+    let ind = alarms.indexOf(alarm);
+    alarms.splice(ind, 1);
+    this.setState({activeAlarms: alarms});
+
+  }
+
   tokenSaved() {
     return window.location.href.includes("success") && sessionStorage.getItem("token");
   }
@@ -71,17 +79,8 @@ class App extends Component {
   }
 
   onChangeTime(time) {
+    time._d.setSeconds(0);
     this.setState({time: time});
-  }
-
-  addAlarm() {
-    if (this.state.time != null) {
-      // add time
-      // link alarm action
-    }
-    else {
-      //todo: error message
-    }
   }
 
   loadUser() {
@@ -98,7 +97,6 @@ class App extends Component {
 
   setActivePl(pl) {
     this.setState({selectedPl: pl})
-    console.log(pl);
   }
 
   loadPlaylists() {
@@ -112,13 +110,12 @@ class App extends Component {
   }
   
   addAlarm() {
-    // todo;
-    // create and add to active alarms
-    // alarm format:
-    // 07:00 AM    Cancel Edit
-    let alarm = {time: this.state.time, pId: this.state.selectedPl};
+    let alarm = {time: this.state.time, pl: this.state.selectedPl};
     let alarms = this.state.activeAlarms;
     alarms.push(alarm);
+    console.log(alarm.time)
+    // todo: sort??? why doesnt it work lmao
+    alarms.sort((a, b) => a.time.isBefore(b.time));
     //alarms = alarms.sort((a, b) => a.time < b.time);
     this.setState({activeAlarms: alarms});
     this.toggleModal();
@@ -127,11 +124,20 @@ class App extends Component {
   renderAlarms() {
     let alarms = [];
     this.state.activeAlarms.map((alarm, i) => {
-      console.log(alarm.time)
+      let time = alarm.time._d.toLocaleTimeString();
+      let end = time.length;
+      time = time.substring(0, end - 6) + " " + time.substring(end - 2, end);
     alarms.push(
-    <ListGroupItem>
-      <div>{alarm.time._d.toString()}</div>
-
+    <ListGroupItem style={{margin: 10}}>
+    <div style={{display: 'flex'}}>
+        <div style={{width: 500}}>
+          <div style={{fontWeight: 'bold'}}>{time}</div>
+          <div>Playlist: {alarm.pl.name}</div>
+        </div>
+        <div>
+          <Button size="md" color="danger" onClick={()=>this.removeAlarm(alarm)}>Remove</Button>
+          </div>
+          </div>
     </ListGroupItem>)
     });
     return alarms;
@@ -140,9 +146,9 @@ class App extends Component {
   renderPlaylists() {
     let playlists = [];
     this.state.playlists.map((pl, i) => {
-      let active = this.state.selectedPl == pl.id? 'darkgray' : 'whitesmoke';
+      let active = this.state.selectedPl && this.state.selectedPl.id == pl.id? 'darkgray' : 'whitesmoke';
       playlists.push(<ListGroupItem 
-        onClick={() => this.setActivePl(pl.id)}
+        onClick={() => this.setActivePl(pl)}
       style={{padding: 5, backgroundColor: active}}>
         <div style={{display: 'flex'}}>
         <img src={pl.images[0].url} height={32} width={32}/>
