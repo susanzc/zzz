@@ -103,7 +103,7 @@ class App extends Component {
   }
 
   tokenSaved() {
-    return window.location.href.includes("success") && sessionStorage.getItem("token");
+    return window.location.href.includes("success") || sessionStorage.getItem("token");
   }
 
   toggleModal() {
