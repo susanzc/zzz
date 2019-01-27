@@ -10,6 +10,7 @@ import 'rc-time-picker/assets/index.css';
 
 var SpotifyWebApi = require('spotify-web-api-node');
 
+// must get spotify client credentials and store in .env file!
 const url = process.env.REACT_APP_URL;
 const getUrl = "https://accounts.spotify.com/authorize/?client_id=" + process.env.REACT_APP_CLIENT_ID
   + "&response_type=token&redirect_uri=" + url + "&scope=user-read-private%20user-top-read%20user-read-email&state=34fFs29kd09";
@@ -361,11 +362,11 @@ class App extends Component {
         </div>
         </center>
         <div style={{right: 50, position: 'fixed', bottom: 50}}>
-        <Button style={{boxShadow: '0px 0px 20px 5px lightseagreen'}}size="lg" color="warning" onClick={this.toggleModal}>+ Add Alarm</Button>
+        <Button style={{boxShadow: '0px 0px 20px 5px lightseagreen'}}size="lg" color="warning" onClick={this.toggleModal}>+ Add Alarm ⏰</Button>
         </div>
         
         <Modal isOpen={this.state.modalOpen} toggle={this.toggleModal}>
-          <ModalHeader toggle={this.toggleModal}>Add Alarm</ModalHeader>
+          <ModalHeader toggle={this.toggleModal}>Add Alarm ⏰</ModalHeader>
           <ModalBody>
           <TimePicker
             showSecond={false}
