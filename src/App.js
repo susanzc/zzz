@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Button, Modal, ModalHeader, ModalFooter, ModalBody, ListGroup, ListGroupItem } from 'reactstrap';
+import { Button, Modal, Input, ModalHeader, ModalFooter, ModalBody, ListGroup, ListGroupItem } from 'reactstrap';
 import TimePicker from 'rc-time-picker';
 import moment from 'moment';
 
@@ -26,7 +26,9 @@ class App extends Component {
     activeAlarms: [], 
     playlists: [],
     time: null,
-    selectedPl: null}
+    selectedPl: null,
+    displayText: [],
+    audio: null}
     this.loadUser = this.loadUser.bind(this);
     this.authenticationComplete = this.authenticationComplete.bind(this);
     this.tokenSaved = this.tokenSaved.bind(this);
@@ -37,6 +39,7 @@ class App extends Component {
     this.renderPlaylists = this.renderPlaylists.bind(this);
     this.removeAlarm = this.removeAlarm.bind(this);
     this.checkAlarms = this.checkAlarms.bind(this);
+    this.checkTrack = this.checkTrack.bind(this);
   }
 
   componentDidMount() {
@@ -91,6 +94,27 @@ class App extends Component {
     this.setState({time: time});
   }
 
+  checkTrack(event) {
+    let track = event.target.value;
+    let toCheck = track.toUpperCase();
+
+    let display = [];
+    let correct = this.state.track;
+    for (let i in track) {
+      let color = 'red';
+      if (track.toUpperCase().charAt(i) == correct.charAt(i)) {
+        color = 'green';
+      }
+      display.push(<span style={{color: color}}>{track.charAt(i)}</span>);
+    }
+    this.setState({displayText: display});
+    if (toCheck == this.state.track) {
+      let audio = this.state.audio;
+      audio.pause();
+      this.setState({track: null, audio: null, enteredText: track});
+    }
+  }
+
   loadUser() {
     let that = this;
     spotifyApi.getMe()
@@ -111,7 +135,6 @@ class App extends Component {
     let that = this;
     spotifyApi.getUserPlaylists()
       .then(function (data) {
-        console.log(data);
         that.setState({playlists: data.body.items});
     }
       )
@@ -121,7 +144,6 @@ class App extends Component {
     let alarm = {time: this.state.time, pl: this.state.selectedPl};
     let alarms = this.state.activeAlarms;
     alarms.push(alarm);
-    console.log(alarm.time);
     alarms.sort((a, b) => a.time.isAfter(b.time) ? 1 : -1);
     this.setState({activeAlarms: alarms});
     this.toggleModal();
@@ -131,6 +153,7 @@ class App extends Component {
   checkAlarms(){
     let activeAlarms = this.state.activeAlarms;
     let newAlarms = [];
+    let that = this;
     for (let i = 0; i < activeAlarms.length; i++) {
       let alarm = activeAlarms[i];
       if (moment().isSameOrAfter(alarm.time)) {
@@ -138,9 +161,16 @@ class App extends Component {
         .then(function(data) {
           let tracks = data.body.tracks.items;
           let track = tracks[Math.floor(Math.random()*tracks.length)].track;
-          console.log(track);
+          while (track == null) {
+            track = tracks[Math.floor(Math.random()*tracks.length)].track;
+          }
           let audio = new Audio(track.preview_url);
           audio.play();
+          let ind = track.name.indexOf('(');
+          if (ind > 0) {
+            track = track.name.substring(0, track.name.indexOf('(')).trim();
+          }
+          that.setState({audio: audio, track: track.name.toUpperCase()});
         }, function(err) {
           console.log('Something went wrong!', err);
         });
@@ -159,7 +189,7 @@ class App extends Component {
       let end = time.length;
       time = time.substring(0, end - 6) + " " + time.substring(end - 2, end);
     alarms.push(
-    <ListGroupItem style={{margin: 10}}>
+    <ListGroupItem style={{margin: 10, width: 600}}>
     <div style={{display: 'flex'}}>
         <div style={{width: 500}}>
           <div style={{fontWeight: 'bold'}}>{time}</div>
@@ -196,10 +226,19 @@ class App extends Component {
       <div className="App">
         <div style={{float: 'right', margin: 20}}>Hi, {(this.state.user).split(" ")[0]}</div>
         <br/>
+        <center>
+          {this.state.audio != null && !this.state.audio.ended &&
+          <div style={{width: 200}}>
+            <Input type="text" onChange={this.checkTrack} name="track" id="track" placeholder="Enter Track Title"/>
+            <div style={{float: 'left', padding: 12}}>{this.state.displayText}</div>
+          </div>
+          }
         <div style={{marginTop: 50, color: "grey"}}>
          {this.state.activeAlarms.length == 0? "No Alarms" : 
          <ListGroup>{this.renderAlarms()}</ListGroup>}
-        </div><div style={{right: 50, position: 'absolute', bottom: 50}}>
+        </div>
+        </center>
+        <div style={{right: 50, position: 'absolute', bottom: 50}}>
         <Button size="lg" color="primary" onClick={this.toggleModal}>+ Add Alarm</Button>
         </div>
         
