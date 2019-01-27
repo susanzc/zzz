@@ -36,6 +36,7 @@ class App extends Component {
     this.setActivePl = this.setActivePl.bind(this);
     this.renderPlaylists = this.renderPlaylists.bind(this);
     this.removeAlarm = this.removeAlarm.bind(this);
+    this.checkAlarms = this.checkAlarms.bind(this);
   }
 
   componentDidMount() {
@@ -55,6 +56,14 @@ class App extends Component {
       this.loadUser();
       this.loadPlaylists();
     }
+      this.interval = setInterval(
+        () => this.checkAlarms(),
+      1000)
+    
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   authenticationComplete() {
@@ -117,6 +126,21 @@ class App extends Component {
     this.setState({activeAlarms: alarms});
     this.toggleModal();
   }
+
+
+  checkAlarms(){
+    let activeAlarms = this.state.activeAlarms;
+    let newAlarms = [];
+    for (let i = 0; i < activeAlarms.length; i++) {
+      if (moment().isSameOrAfter(activeAlarms[i].time)) {
+        alert("Wake up!!!")
+      } else {
+        newAlarms.push(activeAlarms[i]);
+      }
+    }
+    this.setState({activeAlarms: newAlarms});
+  }
+
 
   renderAlarms() {
     let alarms = [];
