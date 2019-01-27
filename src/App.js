@@ -132,8 +132,18 @@ class App extends Component {
     let activeAlarms = this.state.activeAlarms;
     let newAlarms = [];
     for (let i = 0; i < activeAlarms.length; i++) {
-      if (moment().isSameOrAfter(activeAlarms[i].time)) {
-        alert("Wake up!!!")
+      let alarm = activeAlarms[i];
+      if (moment().isSameOrAfter(alarm.time)) {
+        spotifyApi.getPlaylist(alarm.pl.id)
+        .then(function(data) {
+          let tracks = data.body.tracks.items;
+          let track = tracks[Math.floor(Math.random()*tracks.length)].track;
+          console.log(track);
+          let audio = new Audio(track.preview_url);
+          audio.play();
+        }, function(err) {
+          console.log('Something went wrong!', err);
+        });
       } else {
         newAlarms.push(activeAlarms[i]);
       }
