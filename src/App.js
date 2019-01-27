@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Button, Modal, ModalHeader, ModalFooter, ModalBody, ListGroup, ListGroupItem } from 'reactstrap';
 import TimePicker from 'rc-time-picker';
@@ -113,10 +112,8 @@ class App extends Component {
     let alarm = {time: this.state.time, pl: this.state.selectedPl};
     let alarms = this.state.activeAlarms;
     alarms.push(alarm);
-    console.log(alarm.time)
-    // todo: sort??? why doesnt it work lmao
-    alarms.sort((a, b) => a.time.isBefore(b.time));
-    //alarms = alarms.sort((a, b) => a.time < b.time);
+    console.log(alarm.time);
+    alarms.sort((a, b) => a.time.isAfter(b.time) ? 1 : -1);
     this.setState({activeAlarms: alarms});
     this.toggleModal();
   }
@@ -137,7 +134,7 @@ class App extends Component {
         <div>
           <Button size="md" color="danger" onClick={()=>this.removeAlarm(alarm)}>Remove</Button>
           </div>
-          </div>
+    </div>
     </ListGroupItem>)
     });
     return alarms;
