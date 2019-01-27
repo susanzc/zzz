@@ -103,7 +103,7 @@ class App extends Component {
   }
 
   tokenSaved() {
-    return window.location.href.includes("success") || sessionStorage.getItem("token");
+    return window.location.href.includes("success") && sessionStorage.getItem("token");
   }
 
   toggleModal() {
@@ -223,9 +223,9 @@ class App extends Component {
     switch (mathLvl) {
       case "easy":
         a = Math.floor(Math.random() * 10);
-        b = operators[Math.floor((Math.random()) * 99) / 50];
+        b = operators[Math.floor((Math.random() * 99) / 50)];
         c = Math.floor(Math.random() * 10);
-        equation = a.toString() + " " + b + " "+ c.toString();
+        equation = a.toString() + " " + b + " " + c.toString();
         answer = eval(equation);
         break;
       case "moderate":
@@ -266,7 +266,7 @@ class App extends Component {
         .then(function(data) {
           let tracks = data.body.tracks.items;
           let track = tracks[Math.floor(Math.random()*tracks.length)].track;
-          while (track == null) {
+          while (track == null || !track) {
             track = tracks[Math.floor(Math.random()*tracks.length)].track;
           }
           let audio = new Audio(track.preview_url);
